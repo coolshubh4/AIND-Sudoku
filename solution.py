@@ -154,8 +154,26 @@ def search(values):
     You should be able to complete this function by copying your code from the classroom
     and extending it to call the naked twins strategy.
     """
-    # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
+
+    # First, reduce the puzzle using the previous function
+    values = reduce_puzzle(values)
+
+    if values is False:
+        return False # failed earlier
+
+    if all(len(values[s]) == 1 for s in boxes):
+        return values # solved!
+
+    # Choose one of the unfilled squares with the fewest possibilities
+    n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
+
+    # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
+    for value in values:
+        new_sudoku = values.copy()
+        new_sudoku[s] = value
+        attempt = search(new_sudoku)
+        if attempt:
+            return attempt
 
 
 def solve(grid):
@@ -179,7 +197,8 @@ def solve(grid):
 
 
 if __name__ == "__main__":
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
@@ -187,7 +206,8 @@ if __name__ == "__main__":
     try:
         import PySudoku
         PySudoku.play(grid2values(diag_sudoku_grid), result, history)
-
+        #from visualize import visualize_assignments
+        #visualize_assignments(assignments)
     except SystemExit:
         pass
     except:
