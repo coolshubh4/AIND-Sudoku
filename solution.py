@@ -114,8 +114,25 @@ def reduce_puzzle(values):
         The values dictionary after continued application of the constraint strategies
         no longer produces any changes, or False if the puzzle is unsolvable 
     """
-    # TODO: Copy your code from the classroom and modify it to complete this function
-    raise NotImplementedError
+    stalled = False
+
+    while not stalled:
+        
+        solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+        
+        # Use the Eliminate Strategy
+        values = eliminate(values)
+
+        # Use the Only Choice Strategy
+        values = only_choice(values)
+
+        solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+        stalled = solved_values_before == solved_values_after
+
+        if len([box for box in values.keys() if len(values[box]) == 0]):
+            return False
+
+    return values
 
 
 def search(values):
