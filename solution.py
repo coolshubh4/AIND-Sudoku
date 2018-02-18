@@ -63,7 +63,7 @@ def eliminate(values):
     dict
         The values dictionary with the assigned values eliminated from peers
     """
-    
+
     solved_values = [box for box in values.keys() if len(values[box]) == 1]
     for k in solved_values:
         digit = values[k]
@@ -93,9 +93,12 @@ def only_choice(values):
     -----
     You should be able to complete this function by copying your code from the classroom
     """
-    # TODO: Copy your code from the classroom to complete this function
-    raise NotImplementedError
-
+    for unit in unitlist:
+        for digit in '123456789':
+            dplaces = [box for box in unit if digit in values[box]]
+            if len(dplaces) == 1:
+                values[dplaces[0]] = digit  
+    return values
 
 def reduce_puzzle(values):
     """Reduce a Sudoku puzzle by repeatedly applying all constraint strategies
