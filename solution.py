@@ -17,11 +17,8 @@ peers = extract_peers(units, boxes)
 
 assignments = []
 
+"""
 def assign_value(values, box, value):
-    """
-    Please use this function to update your values dictionary!
-    Assigns a value to a given box. If it updates the board record it.
-    """
 
     # Don't waste memory appending actions that don't actually change any values
     if values[box] == value:
@@ -31,7 +28,7 @@ def assign_value(values, box, value):
     if len(value) == 1:
         assignments.append(values.copy())
     return values
-
+"""
 
 def naked_twins(values):
     """Eliminate values using the naked twins strategy.
@@ -60,8 +57,15 @@ def naked_twins(values):
     and because it is simpler (since the reduce_puzzle function already calls this
     strategy repeatedly).
     """
-    # TODO: Implement this function!
-    raise NotImplementedError
+    for unit in unitlist:
+        for box in unit:
+            if len(values[box]) == 2 and [values[bx] for bx in unit].count(values[box]) == 2:
+                for bx in unit:
+                    if values[bx] != values[box] and len(set(values[box]).intersection(values[bx])) > 0:
+                        for val in values[box]:
+                            values[bx] = values[bx].replace(val, "")
+
+    return values
 
 
 def eliminate(values):
@@ -85,7 +89,7 @@ def eliminate(values):
     for k in solved_values:
         digit = values[k]
         for peer in peers[k]:
-            values = assign_value(values, peer, values[peer].replace(digit,''))
+            values[peer] = values[peer].replace(digit,'')
 
     return values
 
@@ -114,7 +118,7 @@ def only_choice(values):
         for digit in '123456789':
             dplaces = [box for box in unit if digit in values[box]]
             if len(dplaces) == 1:
-                values = assign_value(values, dplaces[0], digit)  
+                values[dplaces[0]] = digit
     return values
 
 def reduce_puzzle(values):
@@ -142,6 +146,9 @@ def reduce_puzzle(values):
 
         # Use the Only Choice Strategy
         values = only_choice(values)
+
+        # Use the Naked Twins Strategy
+        values = naked_twins(values)
 
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         stalled = solved_values_before == solved_values_after
@@ -215,7 +222,7 @@ def solve(grid):
 
 if __name__ == "__main__":
     #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    diag_sudoku_grid = '..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..'
+    diag_sudoku_grid = '....2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..'
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
@@ -223,8 +230,6 @@ if __name__ == "__main__":
     try:
         import PySudoku
         PySudoku.play(grid2values(diag_sudoku_grid), result, history)
-        from visualize import visualize_assignments
-        visualize_assignments(assignments)
     except SystemExit:
         pass
     except:
