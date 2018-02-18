@@ -15,6 +15,23 @@ unitlist = unitlist
 units = extract_units(unitlist, boxes)
 peers = extract_peers(units, boxes)
 
+assignments = []
+
+def assign_value(values, box, value):
+    """
+    Please use this function to update your values dictionary!
+    Assigns a value to a given box. If it updates the board record it.
+    """
+
+    # Don't waste memory appending actions that don't actually change any values
+    if values[box] == value:
+        return values
+
+    values[box] = value
+    if len(value) == 1:
+        assignments.append(values.copy())
+    return values
+
 
 def naked_twins(values):
     """Eliminate values using the naked twins strategy.
@@ -68,7 +85,7 @@ def eliminate(values):
     for k in solved_values:
         digit = values[k]
         for peer in peers[k]:
-            values[peer] = values[peer].replace(digit,'')
+            values = assign_value(values, peer, values[peer].replace(digit,''))
 
     return values
 
@@ -97,7 +114,7 @@ def only_choice(values):
         for digit in '123456789':
             dplaces = [box for box in unit if digit in values[box]]
             if len(dplaces) == 1:
-                values[dplaces[0]] = digit  
+                values = assign_value(values, dplaces[0], digit)  
     return values
 
 def reduce_puzzle(values):
@@ -198,7 +215,7 @@ def solve(grid):
 
 if __name__ == "__main__":
     #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    diag_sudoku_grid = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
+    diag_sudoku_grid = '..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..'
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
@@ -206,8 +223,8 @@ if __name__ == "__main__":
     try:
         import PySudoku
         PySudoku.play(grid2values(diag_sudoku_grid), result, history)
-        #from visualize import visualize_assignments
-        #visualize_assignments(assignments)
+        from visualize import visualize_assignments
+        visualize_assignments(assignments)
     except SystemExit:
         pass
     except:
